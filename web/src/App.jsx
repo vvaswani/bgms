@@ -62,7 +62,10 @@ function App() {
 
       // get the timezone for use in reports and table
       const inferredTz = Intl.DateTimeFormat().resolvedOptions().timeZone
+      let userData = response.data
       if (inferredTz && response.data.timezone !== inferredTz) {
+        userData = { ...userData, timezone: inferredTz }
+        setUser(userData)
         try {
           await axios.put(
             `${apiUrl}/api/users/me`,
