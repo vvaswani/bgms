@@ -61,7 +61,7 @@ function App() {
       fetchReports()
 
       // get the timezone for use in reports and table
-      const inferredTz = useMemo(() => Intl.DateTimeFormat().resolvedOptions().timeZone, []);
+      const inferredTz = Intl.DateTimeFormat().resolvedOptions().timeZone
       if (inferredTz && response.data.timezone !== inferredTz) {
         try {
           await axios.put(
@@ -342,7 +342,7 @@ function App() {
                         <td>{r.value}</td>
                         <td>{r.note || '—'}</td>
                         <td>{r.isFasting ? 'Yes' : 'No'}</td>
-                        <td>{new Date(r.createdAt).toLocaleString(undefined, {timeZone: user?.timezone || inferredTz, timeZoneName: 'shortGeneric'})}</td>
+                        <td>{new Date(r.createdAt).toLocaleString(undefined, {timeZone: user?.timezone, timeZoneName: 'shortGeneric'})}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -371,7 +371,7 @@ function App() {
                   <tbody>
                     {reports.map((report) => (
                       <tr key={report.id}>
-                        <td>{new Date(report.date).toLocaleDateString(undefined, {timeZone: user?.timezone || inferredTz,timeZoneName: 'shortGeneric'})}
+                        <td>{new Date(report.date).toLocaleDateString(undefined, {timeZone: user?.timezone,timeZoneName: 'shortGeneric'})}
                         </td>
                         <td>
                           <a
