@@ -314,7 +314,7 @@ function App() {
           <div className="container my-5 p-4 border rounded shadow-sm bg-white">
             <h2 className="mb-4">Trend</h2>
             {readings.length === 0 ? (
-              <p className="text-muted text-center">No data available to display chart.</p>
+              <p className="text-muted text-center">No data available.</p>
             ) : (
               <Line data={chartData} options={chartOptions} />
             )}
@@ -327,7 +327,7 @@ function App() {
             {loading ? (
               <p>Loading readings...</p>
             ) : readings.length === 0 ? (
-              <p>No readings yet.</p>
+              <p>No readings available.</p>
             ) : (
               <div className="table-responsive">
                 <table className="table table-bordered table-striped align-middle">
