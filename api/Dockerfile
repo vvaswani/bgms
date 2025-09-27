@@ -33,6 +33,11 @@ RUN chmod +x /usr/local/bin/docker-entrypoint
 # Change ownership of our applications
 RUN chown -R www-data:www-data /var/www/html
 
+# Create and set permissions for the Railway volume mount point
+RUN mkdir /var/www/html/data
+RUN chown -R www-data:www-data /var/www/html/data
+RUN chmod -R 755 /var/www/html/data
+
 EXPOSE 80
 
 ENTRYPOINT ["docker-entrypoint"]
