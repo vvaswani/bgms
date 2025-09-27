@@ -1,0 +1,50 @@
+# Cache, logs, and sessions
+/var/cache/*
+/var/log/*
+/var/sessions/*
+!/var/cache/.gitkeep
+!/var/log/.gitkeep
+!/var/sessions/.gitkeep
+
+# Composer vendor directory
+/vendor/
+
+# Environment variables and sensitive configuration
+.env.local
+.env.local.*
+.env.test.local
+config/secrets/prod.decrypt.private.php
+config/jwt/private.pem
+config/jwt/public.pem
+
+# Parameters files
+config/parameters.yml
+config/parameters.ini
+
+# IDE and OS specific files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Node.js dependencies (if using Webpack Encore or similar)
+/node_modules/
+
+# Webpack Encore build artifacts (if using)
+/public/build/
+
+# PHPUnit configuration and reports
+phpunit.xml.dist
+/.phpunit.result.cache
+/var/report/
+
+# Other temporary or generated files
+*.bak
+*.swp
+*.swo
+*.tmp
+/data/
+
+###> lexik/jwt-authentication-bundle ###
+/config/jwt/*.pem
+###< lexik/jwt-authentication-bundle ###

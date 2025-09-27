@@ -1,0 +1,31 @@
+security:
+  providers:
+    app_user_provider:
+      entity:
+        class: App\Entity\User
+        property: email
+
+  firewalls:
+    dev:
+      pattern: ^/(_(profiler|wdt)|css|images|js)/
+      security: false
+
+    api:
+      pattern: ^/api/
+      stateless: true
+      provider: app_user_provider
+      jwt: ~
+
+    oauth_login:
+      pattern: ^/connect/google/check$
+      stateless: true
+      custom_authenticators:
+        - App\Security\GoogleAuthenticator
+
+    main:
+      pattern: ^/
+      security: false
+
+  access_control:
+    - { path: ^/api/, roles: IS_AUTHENTICATED_FULLY }
+    - { path: ^/connect/google/check$, roles: IS_AUTHENTICATED_ANONYMOUSLY }

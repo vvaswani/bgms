@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Daily Report - {{ name }}</title>
+</head>
+<body>
+    <h1>Daily Report for {{ name }}</h1>
+    <p>Date: {{ date|date('Y-m-d', timezone) }}</p>
+    <h2>Readings</h2>
+    <ul>
+        {% for reading in readings %}
+            <li>{{ reading.createdAt|date('H:i T', timezone) }} - {{ reading.value }}</li>
+        {% endfor %}
+    </ul>
+    <p><strong>Average Value:</strong> {{ average }}</p>
+</body>
+</html>

@@ -1,0 +1,14 @@
+.add-reading-section,
+.readings-list-section {
+  margin-bottom: 2rem;
+}
+
+/* fix table responsiveness overflow on smaller screens */
+.table-responsive {
+  overflow-x: auto;
+}
+
+.spinner-border {
+  display: block;
+  margin: 1rem auto;
+}
