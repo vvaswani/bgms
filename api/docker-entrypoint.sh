@@ -36,7 +36,7 @@ fi
 
 if [ "$1" = 'php-fpm' ] || [ "$1" = 'php' ] || [ "$1" = 'bin/console' ]; then
 	# Install dependencies
-	composer install --prefer-dist --no-progress --no-suggest --no-interaction
+	composer install --prefer-dist --no-progress --no-interaction
 
 	# Wait for db to be ready
 	until bin/console doctrine:query:sql "SELECT 1" > /dev/null 2>&1; do

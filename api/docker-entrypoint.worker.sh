@@ -2,7 +2,7 @@
 set -e
 
 # Install dependencies
-composer install --prefer-dist --no-progress --no-suggest --no-interaction
+composer install --prefer-dist --no-progress --no-interaction
 
 # Wait for DB to be ready
 until bin/console doctrine:query:sql "SELECT 1" > /dev/null 2>&1; do
