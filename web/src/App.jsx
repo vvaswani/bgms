@@ -21,7 +21,7 @@ function App() {
   const [newReading, setNewReading] = useState({
     value: '',
     note: '',
-    isFasting: false,
+    type: 'random',
   })
   const [loading, setLoading] = useState(false)
   const [loadingUser, setLoadingUser] = useState(true)
@@ -157,11 +157,11 @@ function App() {
         {
           value: parseFloat(newReading.value),
           note: newReading.note || null,
-          isFasting: newReading.isFasting,
+          type: newReading.type,
         },
         { headers: { Authorization: `Bearer ${token}` } }
       )
-      setNewReading({ value: '', note: '', isFasting: false })
+      setNewReading({ value: '', note: '', type: 'random' })
       fetchReadings()
       setError(null)
     } catch {
@@ -227,8 +227,8 @@ function App() {
   }
 
   const categorize = (value) => {
-    if (value < 80) return 'low'
-    if (value > 120) return 'high'
+    if (value < 70) return 'low'
+    if (value > 150) return 'high'
     return 'normal'
   }
 
@@ -343,19 +343,20 @@ function App() {
               </div>
 
               <div className="mb-3">
-                <label htmlFor="fastingSelect" className="form-label">
-                  Fasting
+                <label htmlFor="typeSelect" className="form-label">
+                  Reading Type
                 </label>
                 <select
-                  id="fastingSelect"
+                  id="typeSelect"
                   className="form-select"
-                  value={newReading.isFasting ? 'yes' : 'no'}
+                  value={newReading.type}
                   onChange={(e) =>
-                    setNewReading({ ...newReading, isFasting: e.target.value === 'yes' })
+                    setNewReading({ ...newReading, type: e.target.value })
                   }
                 >
-                  <option value="no">No</option>
-                  <option value="yes">Yes</option>
+                  <option value="fasting">Fasting</option>
+                  <option value="post-prandial">Post-randial</option>
+                  <option value="random">Random</option>
                 </select>
               </div>
 
@@ -392,7 +393,7 @@ function App() {
                     <tr>
                       <th scope="col">Value (mg/dL)</th>
                       <th scope="col">Note</th>
-                      <th scope="col">Fasting</th>
+                      <th scope="col">Type</th>
                       <th scope="col">Date</th>
                     </tr>
                   </thead>
@@ -401,7 +402,15 @@ function App() {
                       <tr key={r.id}>
                         <td>{r.value}</td>
                         <td>{r.note || '—'}</td>
-                        <td>{r.isFasting ? 'Yes' : 'No'}</td>
+                        <td>
+                          {r.type === 'fasting'
+                            ? 'Fasting'
+                            : r.type === 'post-prandial'
+                            ? 'Post-prandial'
+                            : r.type === 'random'
+                            ? 'Random'
+                            : 'Unknown'}
+                        </td>
                         <td>{new Date(r.createdAt).toLocaleString(undefined, {timeZone: user?.timezone, timeZoneName: 'shortGeneric'})}</td>
                       </tr>
                     ))}

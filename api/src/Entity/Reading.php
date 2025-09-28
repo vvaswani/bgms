@@ -9,6 +9,11 @@ use App\Entity\User;
 #[ORM\Entity(repositoryClass: ReadingRepository::class)]
 class Reading
 {
+
+    public const TYPE_FASTING = 'fasting';
+    public const TYPE_POST_PRANDIAL = 'post-prandial';
+    public const TYPE_RANDOM = 'random';
+
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
@@ -27,8 +32,8 @@ class Reading
     #[ORM\Column(type: 'datetime')]
     private ?\DateTimeInterface $createdAt = null;
 
-    #[ORM\Column(type: 'boolean', options: ['default' => false])]
-    private bool $isFasting = false;
+    #[ORM\Column(type: 'string', length: 20, options: ['default' => self::TYPE_RANDOM])]
+    private string $type = self::TYPE_RANDOM;
 
     public function getUser(): ?User
     {
@@ -79,15 +84,24 @@ class Reading
         return $this;
     }
 
-    #[SerializedName('isFasting')]
-    public function isFasting(): bool
+    public function getType(): string
     {
-        return $this->isFasting;
+        return $this->type;
     }
 
-    public function setIsFasting(bool $isFasting): self
+    public function setType(string $type): self
     {
-        $this->isFasting = $isFasting;
+        $allowedTypes = [
+            self::TYPE_FASTING,
+            self::TYPE_POST_PRANDIAL,
+            self::TYPE_RANDOM,
+        ];
+
+        if (!in_array($type, $allowedTypes, true)) {
+            throw new \InvalidArgumentException("Invalid reading type");
+        }
+
+        $this->type = $type;
         return $this;
     }
 }

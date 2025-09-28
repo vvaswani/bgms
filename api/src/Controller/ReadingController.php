@@ -42,23 +42,22 @@ class ReadingController extends AbstractController
             return $this->json(['error' => 'Invalid or missing "value" parameter'], 400);
         }
 
+        $validTypes = [
+            Reading::TYPE_FASTING,
+            Reading::TYPE_POST_PRANDIAL,
+            Reading::TYPE_RANDOM,
+        ];
+
+        $type = $data['type'] ?? Reading::TYPE_RANDOM;
+        if (!in_array($type, $validTypes, true)) {
+            return $this->json(['error' => 'Invalid "type" parameter'], 400);
+        }
+
         $reading = new Reading();
         $reading->setValue((float) $data['value']);
-
         $reading->setNote($data['note'] ?? null);
-
-        $isFasting = false;
-        if (isset($data['isFasting'])) {
-            if (is_bool($data['isFasting'])) {
-                $isFasting = $data['isFasting'];
-            } elseif (is_string($data['isFasting'])) {
-                $isFasting = strtolower($data['isFasting']) === 'true';
-            }
-        }
-        $reading->setIsFasting($isFasting);
-
+        $reading->setType($type);
         $reading->setCreatedAt(new \DateTimeImmutable());
-
         $reading->setUser($user);
 
         $readingRepository->add($reading, true);

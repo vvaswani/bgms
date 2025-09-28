@@ -8,9 +8,9 @@ php bin/console doctrine:migrations:migrate
 php bin/console make:migration
 
 # load dummy data
-php bin/console doctrine:fixtures:load # purge and add
+USER_EMAIL=user@example.com php bin/console doctrine:fixtures:load # purge and add
 or
-php bin/console doctrine:fixtures:load --append # only add
+USER_EMAIL=user@example.com php bin/console doctrine:fixtures:load --append # only add
 
 # run worker
 php bin/console messenger:consume async_reports -vv

@@ -14,7 +14,7 @@
             <tr>
                 <th>Date & Time</th>
                 <th>Value</th>
-                <th>Fasting</th>
+                <th>Type</th>
             </tr>
         </thead>
         <tbody>
@@ -22,7 +22,15 @@
                 <tr>
                     <td>{{ reading.createdAt|date('d M Y H:i T', timezone) }}</td>
                     <td>{{ reading.value }}</td>
-                    <td>{{ reading.isFasting ? 'Yes' : 'No' }}</td>
+                    <td>
+                        {% if reading.type == constant('App\\Entity\\Reading::TYPE_FASTING') %}
+                            Fasting
+                        {% elseif reading.type == constant('App\\Entity\\Reading::TYPE_POST_PRANDIAL') %}
+                            Post-prandial
+                        {% else %}
+                            Random
+                        {% endif %}
+                    </td>
                 </tr>
             {% endfor %}
         </tbody>

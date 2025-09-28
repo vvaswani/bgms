@@ -85,16 +85,23 @@ class GenerateReportMessageHandler
             return (object)[
                 'createdAt' => $convertedCreatedAt,
                 'value' => $reading->getValue(),
-                'isFasting' => $reading->isFasting(),
+                'type' => $reading->getType(),
             ];
         }, $readings);
 
-        $readingSummary = implode(', ', array_map(function ($r) {
+        $typeLabel = fn($type) => match ($type) {
+            Reading::TYPE_FASTING => 'Fasting',
+            Reading::TYPE_POST_PRANDIAL => 'Post-prandial',
+            Reading::TYPE_RANDOM => 'Random',
+            default => 'Random',
+        };
+
+        $readingSummary = implode(', ', array_map(function ($r) use ($typeLabel) {
             return sprintf(
-                '%s: %.1f (Fasting: %s)',
+                '%s: %.1f',
                 $r->createdAt->format('d M Y H:i'),
                 $r->value,
-                $r->isFasting ? 'Yes' : 'No'
+                $typeLabel($r->type)
             );
         }, $convertedReadings));
 
@@ -107,7 +114,7 @@ class GenerateReportMessageHandler
                 'json' => [
                     'contents' => [[
                         'parts' => [[
-                            'text' => "Return your response in plain text only. Do not use Markdown, asterisks (*), underscores (_), bolding, italics, or any special formatting. Analyze these glucose readings (fasting + non-fasting) over the past week:\n\n" . $readingSummary
+                            'text' => "Return your response in plain text only. Do not use Markdown, asterisks (*), underscores (_), bolding, italics, or any special formatting. Analyze these glucose readings (fasting, post-prandial and random) over the past week:\n\n" . $readingSummary
                         ]]
                     ]],
                 ]
@@ -210,7 +217,7 @@ class GenerateReportMessageHandler
             return (object) [
                 'createdAt' => $createdAt,
                 'value' => $r->getValue(),
-                'isFasting' => $r->isFasting(),
+                'type' => $r->getType(),
             ];
         }, $readings);
 
