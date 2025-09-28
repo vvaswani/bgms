@@ -355,7 +355,7 @@ function App() {
                   }
                 >
                   <option value="fasting">Fasting</option>
-                  <option value="post-prandial">Post-randial</option>
+                  <option value="post-prandial">Post-prandial</option>
                   <option value="random">Random</option>
                 </select>
               </div>
