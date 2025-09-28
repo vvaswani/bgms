@@ -15,6 +15,30 @@ services:
       FRONTEND_URL: "http://localhost:5173"
     ports:
       - "9000:9000"
+    depends_on:
+      - database
+      - queue
+      - worker
+
+  worker:
+    build:
+      context: ./api
+      dockerfile: Dockerfile.worker
+    volumes:
+      - ./api:/var/www/html
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-app}:${POSTGRES_PASSWORD:-gue55me}@database:5432/${POSTGRES_DB:-app}?serverVersion=${POSTGRES_VERSION:-16}
+      GEMINI_API_KEY: "${GEMINI_API_KEY}"
+      MESSENGER_TRANSPORT_DSN: redis://queue:6379/messages
+      AWS_ACCESS_KEY_ID: ${MINIO_ROOT_USER}
+      AWS_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD}
+      AWS_REGION: us-east-1
+      AWS_BUCKET: app
+      AWS_ENDPOINT: http://objectstore:9000
+    depends_on:
+      - database
+      - queue
+      - objectstore
 
 
   proxy:
@@ -46,6 +70,23 @@ services:
     volumes:
       - database_data:/var/lib/postgresql/data:rw
 
+  queue:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+
+  objectstore:
+    image: minio/minio
+    ports:
+      - "10001:10001"
+    volumes:
+      - minio_data:/data
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_BUCKETS: app
+    command: server /data --console-address ":10001"
+
   web:
     build:
       context: ./web
@@ -62,3 +103,4 @@ services:
 
 volumes:
   database_data:
+  minio_data:

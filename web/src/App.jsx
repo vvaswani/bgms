@@ -1,3 +1,4 @@
+import { FaArrowDown, FaCircle, FaArrowUp } from 'react-icons/fa'
 import { useState, useEffect, useMemo } from 'react'
 import axios from 'axios'
 import { Line } from 'react-chartjs-2'
@@ -26,7 +27,7 @@ function App() {
   const [loadingUser, setLoadingUser] = useState(true)
   const [error, setError] = useState(null)
   const [user, setUser] = useState(null)
-  const [reports, setReports] = useState([])
+  const [reports, setReports] = useState({ weekly: [], daily: [] })
   const [loadingReports, setLoadingReports] = useState(true)
 
   const apiUrl = import.meta.env.VITE_API_URL
@@ -112,12 +113,11 @@ function App() {
         headers: { Authorization: `Bearer ${token}` },
       })
 
-      // Sort by date and limit to last 7
       const sorted = response.data
         .sort((a, b) => new Date(b.date) - new Date(a.date))
-        .slice(0, 7)
-
-      setReports(sorted)
+      const weekly = sorted.filter((r) => r.type === 'weekly')
+      const daily = sorted.filter((r) => r.type === 'daily')
+      setReports({ weekly, daily })
     } catch (err) {
       console.error('Failed to fetch reports:', err)
     } finally {
@@ -226,6 +226,37 @@ function App() {
     },
   }
 
+  const categorize = (value) => {
+    if (value < 80) return 'low'
+    if (value > 120) return 'high'
+    return 'normal'
+  }
+
+  const getCounts = (readings, userTimezone, daysBack = 1) => {
+    const now = new Date()
+    const startDate = new Date(now)
+    startDate.setHours(0, 0, 0, 0)
+    if (daysBack > 1) {
+      startDate.setDate(startDate.getDate() - (daysBack - 1))
+    }
+
+    const counts = { low: 0, normal: 0, high: 0 }
+
+    readings.forEach((r) => {
+      const localDate = new Date(r.createdAt).toLocaleString('en-US', {
+        timeZone: userTimezone,
+      })
+      const local = new Date(localDate)
+      if (local >= startDate) {
+        const cat = categorize(r.value)
+        counts[cat] += 1
+      }
+    })
+
+    return counts
+  }
+
+
   return (
     <>
       <div className="bg-primary text-white py-5 text-center">
@@ -249,6 +280,32 @@ function App() {
           )}
         </div>
       </div>
+
+      {user && (
+        <div className="bg-primary py-2">
+          <div className="container text-white text-center">
+            <div className="d-flex justify-content-center gap-4 flex-wrap align-items-center small">
+              {[{ label: "Today", days: 1 }, { label: "Last 7 Days", days: 7 }].map(({ label, days }) => {
+                const counts = getCounts(readings, user?.timezone || 'UTC', days)
+                return (
+                  <div key={label} className="d-flex align-items-center gap-2">
+                    <strong className="text-white me-1">{label}:</strong>
+                    <span className="badge bg-light text-danger d-flex align-items-center rounded-pill px-2 py-1">
+                      <FaArrowDown size={12} className="me-1" /> {counts.low}
+                    </span>
+                    <span className="badge bg-light text-success d-flex align-items-center rounded-pill px-2 py-1">
+                      <FaCircle size={12} className="me-1" /> {counts.normal}
+                    </span>
+                    <span className="badge bg-light text-warning d-flex align-items-center rounded-pill px-2 py-1">
+                      <FaArrowUp size={12} className="me-1" /> {counts.high}
+                    </span>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        </div>
+      )}
 
       {!loadingUser && user && (
         <>
@@ -356,45 +413,93 @@ function App() {
 
           {/* reports section */}
           <div className="container my-5 p-4 border rounded shadow-sm bg-white">
-            <h2 className="mb-4">Last 7 Reports</h2>
+            <h2 className="mb-4">Previous Reports</h2>
 
             {loadingReports ? (
               <p>Loading reports...</p>
-            ) : reports.length === 0 ? (
+            ) : reports.weekly.length === 0 && reports.daily.length === 0 ? (
               <p>No reports available.</p>
             ) : (
-              <div className="table-responsive">
-                <table className="table table-bordered table-striped align-middle">
-                  <thead className="table-light">
-                    <tr>
-                      <th scope="col">Date</th>
-                      <th scope="col">Download</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {reports.map((report) => (
-                      <tr key={report.id}>
-                        <td>{new Date(report.date).toLocaleDateString(undefined, {timeZone: user?.timezone,timeZoneName: 'shortGeneric'})}
-                        </td>
-                        <td>
-                          <a
-                            href={`${apiUrl}/download-report/${report.filename}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="btn btn-sm btn-primary"
-                          >
-                            Download PDF
-                          </a>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+              <>
+                {/* weekly reports */}
+                {reports.weekly.length > 0 && (
+                  <>
+                    <h4 className="mt-4">Weekly Reports</h4>
+                    <div className="table-responsive mb-4">
+                      <table className="table table-bordered table-striped align-middle">
+                        <thead className="table-light">
+                          <tr>
+                            <th scope="col">Date</th>
+                            <th scope="col">Download</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {reports.weekly.map((report) => (
+                            <tr key={`weekly-${report.id}`}>
+                              <td> Week starting {new Date(report.date).toLocaleDateString(undefined, {
+                                  timeZone: user?.timezone,
+                                  timeZoneName: 'shortGeneric',
+                                })}
+                              </td>
+                              <td>
+                                <a
+                                  href={`${apiUrl}/download-report/${report.filename}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="btn btn-sm btn-primary"
+                                >
+                                  Download PDF
+                                </a>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </>
+                )}
+
+                {/* daily reports */}
+                {reports.daily.length > 0 && (
+                  <>
+                    <h4 className="mt-4">Daily Reports</h4>
+                    <div className="table-responsive">
+                      <table className="table table-bordered table-striped align-middle">
+                        <thead className="table-light">
+                          <tr>
+                            <th scope="col">Date</th>
+                            <th scope="col">Download</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {reports.daily.map((report) => (
+                            <tr key={`daily-${report.id}`}>
+                              <td>
+                                {new Date(report.date).toLocaleDateString(undefined, {
+                                  timeZone: user?.timezone,
+                                  timeZoneName: 'shortGeneric',
+                                })}
+                              </td>
+                              <td>
+                                <a
+                                  href={`${apiUrl}/download-report/${report.filename}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="btn btn-sm btn-primary"
+                                >
+                                  Download PDF
+                                </a>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </>
+                )}
+              </>
             )}
           </div>
-
-
 
         </>
       )}

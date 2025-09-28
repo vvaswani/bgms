@@ -60,6 +60,7 @@ class GoogleAuthenticator extends OAuth2Authenticator
                     $user = new User();
                     $user->setEmail($userIdentifier);
                     $user->setName($fullName);
+                    $user->setCreatedAt(new \DateTimeImmutable());
                     $this->entityManager->persist($user);
                     $this->entityManager->flush();
                 }

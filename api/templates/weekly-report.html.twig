@@ -2,11 +2,11 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Daily Report - {{ name }}</title>
+    <title>Weekly Report - {{ name }}</title>
 </head>
 <body>
-    <h1>Daily Report for {{ name }}</h1>
-    <p>Date: {{ date|date('d M Y', timezone) }} ({{ timezone }})</p>
+    <h1>Weekly Report for {{ name }}</h1>
+    <p>Date: {{ startDate|date('d M Y', timezone) }} to {{ endDate|date('d M Y', timezone) }} ({{ timezone }})</p>
 
     <h2>Readings</h2>
     <table border="1" cellpadding="6" cellspacing="0">
@@ -29,5 +29,8 @@
     </table>
 
     <p><strong>Average Value:</strong> {{ average }}</p>
+
+    <h2>AI Analysis</h2>
+    <p>{{ analysis|nl2br }}</p>
 </body>
 </html>

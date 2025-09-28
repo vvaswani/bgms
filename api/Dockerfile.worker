@@ -1,32 +1,32 @@
-FROM php:8.2-fpm
+FROM php:8.2-cli
 
 RUN apt-get update && apt-get install -y \
     git \
     curl \
+    zip \
+    unzip \
+    libpq-dev \
     libpng-dev \
     libonig-dev \
     libxml2-dev \
-    zip \
-    unzip \
-    libpq-dev
+    libzip-dev \
+    libssl-dev \
+    libicu-dev
 
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
-RUN docker-php-ext-install pdo pdo_pgsql mbstring exif pcntl bcmath
+RUN docker-php-ext-install pdo pdo_pgsql mbstring bcmath pcntl zip intl
 RUN pecl install redis && docker-php-ext-enable redis
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
 
+# Copy source code
 COPY . .
 
-COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint
+COPY docker-entrypoint.worker.sh /usr/local/bin/docker-entrypoint
 RUN chmod +x /usr/local/bin/docker-entrypoint
 
-RUN chown -R www-data:www-data /var/www/html
-
-EXPOSE 80
-
 ENTRYPOINT ["docker-entrypoint"]
-CMD ["php-fpm"]
+CMD ["php", "bin/console", "messenger:consume", "async", "--limit=50", "--time-limit=300", "--memory-limit=128M"]

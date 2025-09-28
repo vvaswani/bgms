@@ -11,3 +11,6 @@ php bin/console make:migration
 php bin/console doctrine:fixtures:load # purge and add
 or
 php bin/console doctrine:fixtures:load --append # only add
+
+# run worker
+php bin/console messenger:consume async_reports -vv

@@ -11,7 +11,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 class User implements UserInterface
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
+    #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
@@ -23,6 +23,9 @@ class User implements UserInterface
 
     #[ORM\Column(type: 'string', length: 64, nullable: true)]
     private ?string $timezone = null;
+
+    #[ORM\Column(type: 'datetime')]
+    private ?\DateTimeInterface $createdAt = null;
 
     public function getId(): ?int
     {
@@ -59,6 +62,17 @@ class User implements UserInterface
     public function setTimezone(?string $timezone): self
     {
         $this->timezone = $timezone;
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeInterface
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeInterface $createdAt): self
+    {
+        $this->createdAt = $createdAt;
         return $this;
     }
 
