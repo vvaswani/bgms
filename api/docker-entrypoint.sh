@@ -48,7 +48,4 @@ if [ "$1" = 'php-fpm' ] || [ "$1" = 'php' ] || [ "$1" = 'bin/console' ]; then
 	bin/console doctrine:migrations:migrate --no-interaction
 fi
 
-# change permissions of data volume
-chown -R www-data:www-data /var/www/html/data
-
 exec docker-php-entrypoint "$@"
