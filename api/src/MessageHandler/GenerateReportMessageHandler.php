@@ -45,9 +45,14 @@ class GenerateReportMessageHandler
 
     private function generateWeeklyReport(int $userId, \DateTimeInterface $startDate, \DateTimeInterface $endDate): void
     {
+        $user = $this->em->getRepository(User::class)->find($userId);
+        $timezone = new \DateTimeZone($user->getTimezone());
+        $startDateInUserTz = (clone $startDate)->setTimezone($timezone);
+        $endDateInUserTz = (clone $endDate)->modify('-1 day')->setTimezone($timezone);
+
         $existingReport = $this->em->getRepository(Report::class)->findOneBy([
             'user' => $userId,
-            'date' => $startDate,
+            'date' => $startDateInUserTz,
             'type' => Report::TYPE_WEEKLY,
         ]);
 
@@ -121,9 +126,6 @@ class GenerateReportMessageHandler
             $this->logger->error('Gemini API exception', ['exception' => $e]);
         }
 
-        $startDateInUserTz = (clone $startDate)->setTimezone($timezone);
-        $endDateInUserTz = (clone $endDate)->modify('-1 day')->setTimezone($timezone);
-
         $html = $this->twig->render('weekly-report.html.twig', [
             'name' => $user->getName(),
             'startDate' => $startDateInUserTz->format('d M Y'),
@@ -161,7 +163,7 @@ class GenerateReportMessageHandler
 
         $report = new Report();
         $report->setUser($user);
-        $report->setDate($startDate);
+        $report->setDate($startDateInUserTz);
         $report->setType(Report::TYPE_WEEKLY);
         $report->setFilename($filename);
 
@@ -172,9 +174,13 @@ class GenerateReportMessageHandler
 
     private function generateDailyReport(int $userId, \DateTimeInterface $startDate, \DateTimeInterface $endDate): void
     {
+        $user = $this->em->getRepository(User::class)->find($userId);
+        $timezone = new \DateTimeZone($user->getTimezone());
+        $startDateInUserTz = (clone $startDate)->setTimezone($timezone);
+
         $existingReport = $this->em->getRepository(Report::class)->findOneBy([
             'user' => $userId,
-            'date' => $startDate,
+            'date' => $startDateInUserTz,
             'type' => Report::TYPE_DAILY,
         ]);
 
@@ -198,10 +204,6 @@ class GenerateReportMessageHandler
 
         $values = array_map(fn($r) => $r->getValue(), $readings);
         $average = array_sum($values) / count($values);
-
-        $user = $this->em->getRepository(User::class)->find($userId);
-        $timezone = new \DateTimeZone($user->getTimezone());
-        $startDateInUserTz = (clone $startDate)->setTimezone($timezone);
 
         $convertedReadings = array_map(function (Reading $r) use ($timezone) {
             $createdAt = (clone $r->getCreatedAt())->setTimezone($timezone);
@@ -245,7 +247,7 @@ class GenerateReportMessageHandler
 
         $report = new Report();
         $report->setUser($user);
-        $report->setDate($startDate);
+        $report->setDate($startDateInUserTz);
         $report->setType(Report::TYPE_DAILY);
         $report->setFilename($filename);
 

@@ -41,6 +41,7 @@ services:
       AWS_REGION: us-east-1
       AWS_BUCKET: app
       AWS_ENDPOINT: http://objectstore:9000
+    restart: always
     depends_on:
       - database
       - queue

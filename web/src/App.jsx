@@ -284,20 +284,20 @@ function App() {
       {user && (
         <div className="bg-primary py-2">
           <div className="container text-white text-center">
-            <div className="d-flex justify-content-center gap-4 flex-wrap align-items-center small">
+            <div className="d-flex justify-content-center gap-4 flex-wrap align-items-center mt-2">
               {[{ label: "Today", days: 1 }, { label: "Last 7 Days", days: 7 }].map(({ label, days }) => {
                 const counts = getCounts(readings, user?.timezone || 'UTC', days)
                 return (
                   <div key={label} className="d-flex align-items-center gap-2">
                     <strong className="text-white me-1">{label}:</strong>
                     <span className="badge bg-light text-danger d-flex align-items-center rounded-pill px-2 py-1">
-                      <FaArrowDown size={12} className="me-1" /> {counts.low}
+                      <FaArrowDown size={14} className="me-2" /> {counts.low}
                     </span>
                     <span className="badge bg-light text-success d-flex align-items-center rounded-pill px-2 py-1">
-                      <FaCircle size={12} className="me-1" /> {counts.normal}
+                      <FaCircle size={14} className="me-2" /> {counts.normal}
                     </span>
                     <span className="badge bg-light text-warning d-flex align-items-center rounded-pill px-2 py-1">
-                      <FaArrowUp size={12} className="me-1" /> {counts.high}
+                      <FaArrowUp size={14} className="me-2" /> {counts.high}
                     </span>
                   </div>
                 )
@@ -424,7 +424,7 @@ function App() {
                 {/* weekly reports */}
                 {reports.weekly.length > 0 && (
                   <>
-                    <h4 className="mt-4">Weekly Reports</h4>
+                    <h4 className="mt-4">Weekly Reports (with AI Analysis)</h4>
                     <div className="table-responsive mb-4">
                       <table className="table table-bordered table-striped align-middle">
                         <thead className="table-light">
