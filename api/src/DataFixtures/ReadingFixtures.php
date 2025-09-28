@@ -18,10 +18,10 @@ class ReadingFixtures extends Fixture
         // add dummy readings
         for ($i = 0; $i < 25; $i++) {
             $reading = new Reading();
-            $reading->setValue(mt_rand(80, 360));
+            $reading->setValue(mt_rand(50, 250));
             $reading->setNote(mt_rand(0, 1) ? 'After meal' : null);
             $reading->setIsFasting((bool)random_int(0, 1));
-            $reading->setCreatedAt(new \DateTimeImmutable(sprintf('-%d days', $i)));
+            $reading->setCreatedAt(new \DateTimeImmutable(sprintf('-%d days', random_int(0, 7))));
             $reading->setUser($user);
 
             $manager->persist($reading);
