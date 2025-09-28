@@ -11,7 +11,7 @@ class ReadingFixtures extends Fixture
     public function load(ObjectManager $manager): void
     {
         $email = getenv('USER_EMAIL') ?: 'vikram.melonfire@gmail.com';
-        $user = $manager->getRepository(User::class)->findOneBy(['email' => 'vikram.melonfire@gmail.com']);
+        $user = $manager->getRepository(User::class)->findOneBy(['email' => $email]);
         if (!$user) {
             throw new \Exception('User not found in the database.');
         }
