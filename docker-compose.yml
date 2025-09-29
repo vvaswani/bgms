@@ -24,7 +24,7 @@ services:
     depends_on:
       - database
       - queue
-      - worker
+      - objectstore
 
   worker:
     build:
